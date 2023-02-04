@@ -1,6 +1,9 @@
 import { Component } from 'react';
 import { nanoid } from 'nanoid';
 
+import ContactList from 'components/ContactList/ContactList';
+import ContactsFilter from 'components/ContactsFilter/ContactsFilter';
+import ContactsForm from 'components/ContactsForm/ContactsForm';
 import styles from './contacs-books.module.css';
 
 class ContactsBook extends Component {
@@ -16,23 +19,20 @@ class ContactsBook extends Component {
     number: '',
   };
 
-  addContact = e => {
-    e.preventDefault();
-    const { name, number } = this.state;
-
+  addContact = ({ name, number }) => {
     if (this.isDublicate(name, number)) {
       return alert(`${name} is already in contacts`);
     }
 
     this.setState(prevState => {
-      const { name, number, contacts } = prevState;
+      const { contacts } = prevState;
 
       const newContact = {
         id: nanoid(),
         name,
         number,
       };
-      return { contacts: [newContact, ...contacts], name: '', number: '' };
+      return { contacts: [newContact, ...contacts] };
     });
   };
 
@@ -55,16 +55,36 @@ class ContactsBook extends Component {
     });
   };
 
-  removeContact(id) {
+  removeContact = id => {
     this.setState(({ contacts }) => {
       const newContacts = contacts.filter(contact => contact.id !== id);
       return { contacts: newContacts };
     });
+  };
+
+  handleFilter = target => {
+    this.setState({ filter: target.value });
+  };
+
+  getContact() {
+    const { filter, contacts } = this.state;
+    if (!filter) {
+      return contacts;
+    }
+    const normalizedFilter = filter.toLowerCase();
+    const result = contacts.filter(({ name, number }) => {
+      return (
+        name.toLowerCase().includes(normalizedFilter) || number.includes(filter)
+      );
+    });
+    return result;
   }
 
   render() {
-    const { addContact, handleChange } = this;
-    const { contacts, name, number } = this.state;
+    const { addContact, handleFilter, removeContact, handleChange } = this;
+    const { name, number } = this.state;
+    const contacts = this.getContact();
+
     const items = contacts.map(({ id, name, number }) => (
       <li key={id}>
         {name}: {number}{' '}
@@ -103,6 +123,7 @@ class ContactsBook extends Component {
               Add contact
             </button>
           </form>
+          <ContactsForm onSubmit={addContact} />
         </div>
         <div className={styles.block}>
           <div className={styles.formElements}>
@@ -113,7 +134,9 @@ class ContactsBook extends Component {
               placeholder="Filter Contacts"
             />
           </div>
+          <ContactsFilter handleChange={handleFilter} />
           <ul>{items}</ul>
+          <ContactList removeContact={removeContact} contacts={contacts} />
         </div>
       </div>
     );
