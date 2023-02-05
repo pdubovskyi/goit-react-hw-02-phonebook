@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import styles from '../ContactsBooks/contacs-books.module.css';
 
 const ContactsFilter = ({ handleChange }) => {
@@ -11,6 +13,10 @@ const ContactsFilter = ({ handleChange }) => {
       />
     </div>
   );
+};
+
+ContactsFilter.propTypes = {
+  handleChange: PropTypes.func.isRequired,
 };
 
 export default ContactsFilter;

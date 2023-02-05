@@ -15,8 +15,6 @@ class ContactsBook extends Component {
       { id: nanoid(), name: 'Annie Copeland', number: '227-91-26' },
     ],
     filter: '',
-    name: '',
-    number: '',
   };
 
   addContact = ({ name, number }) => {
@@ -38,22 +36,13 @@ class ContactsBook extends Component {
 
   isDublicate(name, newNumber) {
     const normalizedName = name.toLowerCase();
-    console.log(newNumber);
     const { contacts } = this.state;
     const dublicatedContacts = contacts.find(({ name, number }) => {
       return name.toLowerCase() === normalizedName && number === newNumber;
     });
-    console.log(dublicatedContacts);
 
     return Boolean(dublicatedContacts);
   }
-
-  handleChange = ({ target }) => {
-    const { name, value } = target;
-    this.setState({
-      [name]: value,
-    });
-  };
 
   removeContact = id => {
     this.setState(({ contacts }) => {
@@ -62,7 +51,7 @@ class ContactsBook extends Component {
     });
   };
 
-  handleFilter = target => {
+  handleFilter = ({ target }) => {
     this.setState({ filter: target.value });
   };
 
@@ -81,61 +70,17 @@ class ContactsBook extends Component {
   }
 
   render() {
-    const { addContact, handleFilter, removeContact, handleChange } = this;
-    const { name, number } = this.state;
+    const { addContact, handleFilter, removeContact } = this;
     const contacts = this.getContact();
-
-    const items = contacts.map(({ id, name, number }) => (
-      <li key={id}>
-        {name}: {number}{' '}
-        <button onClick={() => this.removeContact(id)} type="button">
-          Delete
-        </button>
-      </li>
-    ));
 
     return (
       <div className={styles.wrapper}>
         <div className={styles.block}>
           <h4>Phonebook</h4>
-          <form action="" onSubmit={addContact}>
-            <div className={styles.formElements}>
-              <label htmlFor="">Name</label>
-              <input
-                value={name}
-                name="name"
-                onChange={handleChange}
-                type="text"
-                placeholder="Name"
-              />
-            </div>
-            <div className={styles.formElements}>
-              <label htmlFor="">Number</label>
-              <input
-                value={number}
-                onChange={handleChange}
-                name="number"
-                type="text"
-                placeholder="Number"
-              />
-            </div>
-            <button className={styles.btn} type="submit">
-              Add contact
-            </button>
-          </form>
           <ContactsForm onSubmit={addContact} />
         </div>
         <div className={styles.block}>
-          <div className={styles.formElements}>
-            <label htmlFor="">Find contacts by name</label>
-            <input
-              onChange={handleChange}
-              name="filter"
-              placeholder="Filter Contacts"
-            />
-          </div>
           <ContactsFilter handleChange={handleFilter} />
-          <ul>{items}</ul>
           <ContactList removeContact={removeContact} contacts={contacts} />
         </div>
       </div>
